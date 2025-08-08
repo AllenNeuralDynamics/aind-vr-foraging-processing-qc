@@ -74,6 +74,12 @@ if __name__ == '__main__':
     logger.info("Computing running velocity evaluation")
     running_velocity_metric = utils.get_running_velocity_qc_metric(nwb, settings.output_directory)
 
+    logger.info("Computing general peformance evaluation")
+    general_performance_metrics = utils.get_general_performance_qc_metrics(nwb, settings.output_directory)
+
+    logger.info("Computing lick evaluations")
+    lick_metrics = utils.get_lick_qc_metrics(nwb, settings.output_directory)
+
     evaluations = []
 
     for name, metric in environment_metrics.items():
@@ -81,7 +87,13 @@ if __name__ == '__main__':
 
     for name, metric in running_velocity_metric.items():
         evaluations.append(get_qc_evaluation(name, metric))
+    
+    for name, metric in general_performance_metrics.items():
+        evaluations.append(get_qc_evaluation(name, metric))
 
+    for name, metric in lick_metrics.items():
+        evaluations.append(get_qc_evaluation(name, metric))
+        
     quality_control = QualityControl(
         evaluations=evaluations
     )
