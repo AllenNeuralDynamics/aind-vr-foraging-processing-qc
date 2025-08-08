@@ -1,12 +1,13 @@
 import json
-import matplotlib.pyplot as plt
-from pynwb import NWBFile
-from aind_data_schema.core.quality_control import QCMetric, QCStatus, Status
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
-from datetime import datetime
-from scipy.stats import gaussian_kde
+
+import matplotlib.pyplot as plt
 import numpy as np
+from aind_data_schema.core.quality_control import QCMetric, QCStatus, Status
+from pynwb import NWBFile
+from scipy.stats import gaussian_kde
 
 status_pending = QCStatus(
     evaluator="", status=Status.PENDING, timestamp=datetime.now()
