@@ -8,9 +8,14 @@ from datetime import datetime
 from scipy.stats import gaussian_kde
 import numpy as np
 
-status_pending = QCStatus(evaluator="", status=Status.PENDING, timestamp=datetime.now())
+status_pending = QCStatus(
+    evaluator="", status=Status.PENDING, timestamp=datetime.now()
+)
 
-def get_environment_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMetric]]:
+
+def get_environment_qc_metrics(
+    nwb: NWBFile, output_path: Path
+) -> Dict[str, List[QCMetric]]:
     """
     Gets qc metrics for envrionmental conditions
 
@@ -18,17 +23,19 @@ def get_environment_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, Lis
     ----------
     nwb: NWBFile
         The processed nwb file
-    
+
     output_path: Path
         Output directory where figures are to be saved
-    
+
     Returns
     -------
     Dict[str, List[QCMetric]]
-        Dictionary with qc metrics 
+        Dictionary with qc metrics
     """
     qc_metrics = {"Enviornmental Conditions": []}
-    sensor_data = nwb.acquisition["Behavior.HarpEnvironmentSensor.SensorData"][:]
+    sensor_data = nwb.acquisition["Behavior.HarpEnvironmentSensor.SensorData"][
+        :
+    ]
 
     for metric_name in ("Temperature", "Humidity"):
         average = float(sensor_data[metric_name].mean())
@@ -45,13 +52,16 @@ def get_environment_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, Lis
             value={"Average": average},
             reference=f"/environment_{metric_name}.png",
             description=metric_name,
-            status_history=[status_pending]
+            status_history=[status_pending],
         )
         qc_metrics["Enviornmental Conditions"].append(qc_metric)
-    
+
     return qc_metrics
 
-def get_running_velocity_qc_metric(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMetric]]:
+
+def get_running_velocity_qc_metric(
+    nwb: NWBFile, output_path: Path
+) -> Dict[str, List[QCMetric]]:
     """
     Gets the running velocity from the processed nwb
 
@@ -59,31 +69,32 @@ def get_running_velocity_qc_metric(nwb: NWBFile, output_path: Path) -> Dict[str,
     ----------
     nwb: NWBFile
         The processed nwb file
-    
+
     output_path: Path
         Output directory where figures are to be saved
-    
+
     Returns
     -------
     Dict[str, List[QCMetric]]
-        Dictionary with qc metrics 
+        Dictionary with qc metrics
     """
     metric_name = "Running Velocity"
     running_data = nwb.processing["behavior"].data_interfaces["Treadmill"]
-    timestamps = running_data.timestamps[:]
     data = running_data.data[:]
-
 
     qc_metric = QCMetric(
         name=metric_name,
         value={"Average": float(np.nanmean(data))},
         description=metric_name,
-        status_history=[status_pending]
+        status_history=[status_pending],
     )
 
     return {metric_name: [qc_metric]}
 
-def get_general_performance_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMetric]]:
+
+def get_general_performance_qc_metrics(
+    nwb: NWBFile, output_path: Path
+) -> Dict[str, List[QCMetric]]:
     """
     Gets the general performance metrics from the processed nwb
 
@@ -91,20 +102,24 @@ def get_general_performance_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[
     ----------
     nwb: NWBFile
         The processed nwb file
-    
+
     output_path: Path
         Output directory where figures are to be saved
-    
+
     Returns
     -------
     Dict[str, List[QCMetric]]
-        Dictionary with qc metrics 
+        Dictionary with qc metrics
     """
     metric_name = "General Performance"
     events = nwb.get_events__events_tables().to_dataframe()
 
     total_rewards = len(events[events["event_name"] == "GiveReward"])
-    total_patches = events[events["event_name"] == "ActivePatch"]["event_data"].unique().size
+    total_patches = (
+        events[events["event_name"] == "ActivePatch"]["event_data"]
+        .unique()
+        .size
+    )
 
     qc_metric = QCMetric(
         name=metric_name,
@@ -113,12 +128,15 @@ def get_general_performance_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[
             "Total Patches": total_patches,
         },
         description=metric_name,
-        status_history=[status_pending]
+        status_history=[status_pending],
     )
 
     return {metric_name: [qc_metric]}
-    
-def get_lick_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMetric]]:
+
+
+def get_lick_qc_metrics(
+    nwb: NWBFile, output_path: Path
+) -> Dict[str, List[QCMetric]]:
     """
     Gets the lick metrics from the processed nwb
 
@@ -126,14 +144,14 @@ def get_lick_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMet
     ----------
     nwb: NWBFile
         The processed nwb file
-    
+
     output_path: Path
         Output directory where figures are to be saved
-    
+
     Returns
     -------
     Dict[str, List[QCMetric]]
-        Dictionary with qc metrics 
+        Dictionary with qc metrics
     """
     metric_name = "Licks"
     metrics = {metric_name: []}
@@ -151,7 +169,7 @@ def get_lick_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMet
     density = kde(x)
 
     ax.plot(x, density)
-    ax.axhline(0.1, color='r', linestyle='--')
+    ax.axhline(0.1, color="r", linestyle="--")
     ax.set_xlabel("Inter-lick interval (s)")
     ax.set_ylabel("Density")
     fig.savefig(output_path / "inter_licks_distribution.png")
@@ -160,7 +178,7 @@ def get_lick_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMet
         value=None,
         reference="/inter_licks_distribution.png",
         description="Inter-licks distribution",
-        status_history=[status_pending]
+        status_history=[status_pending],
     )
     metrics[metric_name].append(qc_metric_inter_licks_distribution)
 
@@ -168,23 +186,25 @@ def get_lick_qc_metrics(nwb: NWBFile, output_path: Path) -> Dict[str, List[QCMet
         name="Number of licks",
         value={"Number of licks": len(licks[licks["event_data"]])},
         description="Number of licks",
-        status_history=[status_pending]
+        status_history=[status_pending],
     )
     metrics[metric_name].append(qc_metric_lick_count)
 
     # offset - onset
-    lick_variability_within = len(licks[~licks["event_data"]]) - len(licks[licks["event_data"]])
+    lick_variability_within = len(licks[~licks["event_data"]]) - len(
+        licks[licks["event_data"]]
+    )
 
     qc_metric_within_lick_distribution = QCMetric(
         name="Within lick variability (offset - onset)",
-        value={"Within lick variability (offset - onset)": np.std(lick_variability_within)},
+        value={
+            "Within lick variability (offset - onset)": np.std(
+                lick_variability_within
+            )
+        },
         description="Within lick variability",
-        status_history=[status_pending]
+        status_history=[status_pending],
     )
-    metrics[metric_name].append(qc_metric_inter_licks_distribution)
+    metrics[metric_name].append(qc_metric_within_lick_distribution)
 
     return metrics
-
-
-
-

@@ -1,11 +1,12 @@
 import logging
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema.core.quality_control import QualityControl, QCMetric, QCEvaluation, Stage
-
-from hdmf_zarr import NWBZarrIO
 from pathlib import Path
-from pydantic_settings import BaseSettings
+
+from aind_data_schema.core.quality_control import (QCEvaluation, QCMetric,
+                                                   QualityControl, Stage)
+from aind_data_schema_models.modalities import Modality
+from hdmf_zarr import NWBZarrIO
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 import utils
 
@@ -25,6 +26,7 @@ class VRForagingSettings(BaseSettings, cli_parse_args=True):
         default=Path("/results/"), description="Output directory"
     )
 
+
 def get_qc_evaluation(name: str, metric: QCMetric) -> QCEvaluation:
     """
     Gets the qc evaluation
@@ -33,10 +35,10 @@ def get_qc_evaluation(name: str, metric: QCMetric) -> QCEvaluation:
     ----------
     name: str
         The name of the evaluation
-    
+
     metric: QCMetric
-        The qc metric 
-    
+        The qc metric
+
     Returns
     -------
     QCEvaluation
@@ -47,12 +49,13 @@ def get_qc_evaluation(name: str, metric: QCMetric) -> QCEvaluation:
         stage=Stage.PROCESSING,
         name=name,
         description=name,
-        metrics=metric
+        metrics=metric,
     )
-    
+
     return evaluation
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
     )
@@ -67,15 +70,21 @@ if __name__ == '__main__':
     logger.info(f"Found processed nwb at path {processed_nwb_path[0]}")
     with NWBZarrIO(processed_nwb_path[0].as_posix(), "r") as io:
         nwb = io.read()
-    
+
     logger.info("Computing environment condition evaluation")
-    environment_metrics = utils.get_environment_qc_metrics(nwb, settings.output_directory)
+    environment_metrics = utils.get_environment_qc_metrics(
+        nwb, settings.output_directory
+    )
 
     logger.info("Computing running velocity evaluation")
-    running_velocity_metric = utils.get_running_velocity_qc_metric(nwb, settings.output_directory)
+    running_velocity_metric = utils.get_running_velocity_qc_metric(
+        nwb, settings.output_directory
+    )
 
     logger.info("Computing general peformance evaluation")
-    general_performance_metrics = utils.get_general_performance_qc_metrics(nwb, settings.output_directory)
+    general_performance_metrics = utils.get_general_performance_qc_metrics(
+        nwb, settings.output_directory
+    )
 
     logger.info("Computing lick evaluations")
     lick_metrics = utils.get_lick_qc_metrics(nwb, settings.output_directory)
@@ -87,16 +96,14 @@ if __name__ == '__main__':
 
     for name, metric in running_velocity_metric.items():
         evaluations.append(get_qc_evaluation(name, metric))
-    
+
     for name, metric in general_performance_metrics.items():
         evaluations.append(get_qc_evaluation(name, metric))
 
     for name, metric in lick_metrics.items():
         evaluations.append(get_qc_evaluation(name, metric))
-        
-    quality_control = QualityControl(
-        evaluations=evaluations
-    )
+
+    quality_control = QualityControl(evaluations=evaluations)
 
     with open(settings.output_directory / "quality_control.json", "w") as f:
         f.write(quality_control.model_dump_json(indent=4))
