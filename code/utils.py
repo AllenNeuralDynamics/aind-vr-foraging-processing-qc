@@ -173,6 +173,7 @@ def get_lick_qc_metrics(
     ax.axhline(0.1, color="r", linestyle="--")
     ax.set_xlabel("Inter-lick interval (s)")
     ax.set_ylabel("Density")
+    ax.set_title("Inter-licks Distribution")
     fig.savefig(output_path / "inter_licks_distribution.png")
     qc_metric_inter_licks_distribution = QCMetric(
         name="Inter-licks distribution",
