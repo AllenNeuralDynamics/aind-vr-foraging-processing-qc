@@ -80,7 +80,7 @@ def get_running_velocity_qc_metric(
         Dictionary with qc metrics
     """
     metric_name = "Running Velocity"
-    running_data = nwb.processing["behavior"].data_interfaces["Treadmill"]
+    running_data = nwb.processing["behavior"].data_interfaces["Encoder"]
     data = running_data.data[:]
 
     qc_metric = QCMetric(
