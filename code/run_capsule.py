@@ -1,3 +1,4 @@
+import json
 import logging
 from pathlib import Path
 
@@ -103,7 +104,13 @@ if __name__ == "__main__":
     for name, metric in lick_metrics.items():
         evaluations.append(get_qc_evaluation(name, metric))
 
-    quality_control = QualityControl(evaluations=evaluations)
 
+    with open(settings.input_directory.parent / "raw_qc.json", "r") as f:
+        raw_qc = json.load(f)
+    
+    for evaluation in QualityControl(**raw_qc).evaluations:
+        evaluations.append(evaluation)
+
+    quality_control = QualityControl(evaluations=evaluations)
     with open(settings.output_directory / "quality_control.json", "w") as f:
         f.write(quality_control.model_dump_json(indent=4))
