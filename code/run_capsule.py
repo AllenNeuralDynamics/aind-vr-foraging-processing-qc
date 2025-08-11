@@ -104,10 +104,9 @@ if __name__ == "__main__":
     for name, metric in lick_metrics.items():
         evaluations.append(get_qc_evaluation(name, metric))
 
-
     with open(settings.input_directory.parent / "raw_qc.json", "r") as f:
         raw_qc = json.load(f)
-    
+
     for evaluation in QualityControl(**raw_qc).evaluations:
         evaluations.append(evaluation)
 

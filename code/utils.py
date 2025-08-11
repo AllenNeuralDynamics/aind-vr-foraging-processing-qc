@@ -51,7 +51,7 @@ def get_environment_qc_metrics(
         qc_metric = QCMetric(
             name=f"Environment - {metric_name}",
             value={"Average": average},
-            reference=f"/environment_{metric_name}.png",
+            reference=f"environment_{metric_name}.png",
             description=metric_name,
             status_history=[status_pending],
         )
@@ -178,7 +178,7 @@ def get_lick_qc_metrics(
     qc_metric_inter_licks_distribution = QCMetric(
         name="Inter-licks distribution",
         value=None,
-        reference="/inter_licks_distribution.png",
+        reference="inter_licks_distribution.png",
         description="Inter-licks distribution",
         status_history=[status_pending],
     )
@@ -193,17 +193,42 @@ def get_lick_qc_metrics(
     metrics[metric_name].append(qc_metric_lick_count)
 
     # offset - onset
-    lick_variability_within = len(licks[~licks["event_data"]]) - len(
-        licks[licks["event_data"]]
+    lick_onset_offset = nwb.acquisition["Behavior.HarpLickometer.LickState"][:]
+    onsets = lick_onset_offset.loc[
+        lick_onset_offset["Channel0"], "Time"
+    ].reset_index(drop=True)
+    offsets = lick_onset_offset.loc[
+        ~lick_onset_offset["Channel0"], "Time"
+    ].reset_index(drop=True)
+
+    durations = onsets - offsets
+    lick_variability_within = np.nanstd(durations)
+
+    # Plot histogram
+    fig, ax = plt.subplots()
+    ax.hist(durations, bins=30, alpha=0.7, edgecolor="black")
+
+    # Mark mean
+    mean_dur = np.mean(durations)
+    ax.axvline(
+        mean_dur, color="blue", linestyle="--", label=f"Mean = {mean_dur:.3f}s"
     )
 
+    ax.set_xlabel("Lick duration (s)")
+    ax.set_ylabel("Count")
+    ax.set_title("Within-lick Duration Distribution (Onset - Offset)")
+    ax.set_xlim((0, 200))
+    ax.legend()
+    fig.savefig(output_path / "licks.png")
+
     qc_metric_within_lick_distribution = QCMetric(
-        name="Within lick variability (offset - onset)",
+        name="Within lick variability (onset - offset)",
         value={
-            "Within lick variability (offset - onset)": np.std(
+            "Within lick variability (onset - offset)": float(
                 lick_variability_within
             )
         },
+        reference="licks.png",
         description="Within lick variability",
         status_history=[status_pending],
     )
