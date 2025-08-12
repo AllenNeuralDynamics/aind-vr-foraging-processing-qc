@@ -165,24 +165,25 @@ def get_lick_qc_metrics(
     fig, ax = plt.subplots()
     inter_licks_distribution = np.diff(licks[licks["event_data"]]["timestamp"])
     # KDE
-    kde = gaussian_kde(inter_licks_distribution)
-    x = np.linspace(0, max(inter_licks_distribution), 500)
-    density = kde(x)
+    if len(inter_licks_distribution) > 1:
+        kde = gaussian_kde(inter_licks_distribution)
+        x = np.linspace(0, max(inter_licks_distribution), 500)
+        density = kde(x)
 
-    ax.plot(x, density)
-    ax.axhline(0.1, color="r", linestyle="--")
-    ax.set_xlabel("Inter-lick interval (s)")
-    ax.set_ylabel("Density")
-    ax.set_title("Inter-licks Distribution")
-    fig.savefig(output_path / "inter_licks_distribution.png")
-    qc_metric_inter_licks_distribution = QCMetric(
-        name="Inter-licks distribution",
-        value=None,
-        reference="inter_licks_distribution.png",
-        description="Inter-licks distribution",
-        status_history=[status_pending],
-    )
-    metrics[metric_name].append(qc_metric_inter_licks_distribution)
+        ax.plot(x, density)
+        ax.axhline(0.1, color="r", linestyle="--")
+        ax.set_xlabel("Inter-lick interval (s)")
+        ax.set_ylabel("Density")
+        ax.set_title("Inter-licks Distribution")
+        fig.savefig(output_path / "inter_licks_distribution.png")
+        qc_metric_inter_licks_distribution = QCMetric(
+            name="Inter-licks distribution",
+            value=None,
+            reference="inter_licks_distribution.png",
+            description="Inter-licks distribution",
+            status_history=[status_pending],
+        )
+        metrics[metric_name].append(qc_metric_inter_licks_distribution)
 
     qc_metric_lick_count = QCMetric(
         name="Number of licks",
