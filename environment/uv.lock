@@ -3,10 +3,38 @@ revision = 3
 requires-python = ">=3.12"
 
 [[package]]
+name = "aind-data-schema"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aind-data-schema-models" },
+    { name = "pydantic" },
+    { name = "semver" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/34/d3/b8c49737c207966eef2a19f74f599b69f4b7fc3d8abfc33a164397252088/aind_data_schema-1.4.0.tar.gz", hash = "sha256:9768e00ee1f7ea4da72abc4b365ee807c2129dd30da96e759ae17ed93824b40e", size = 858325, upload-time = "2025-02-28T18:55:56.25Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/02/da/bce4b9d3122cb98e055d7a9d3159117eb810992605aa849bef4b9e8069fc/aind_data_schema-1.4.0-py3-none-any.whl", hash = "sha256:d82fbbd96f3588a9b03b0275bb89831a1b901c5b63e8790f07583d0fd4a4c732", size = 65020, upload-time = "2025-02-28T18:55:53.068Z" },
+]
+
+[[package]]
+name = "aind-data-schema-models"
+version = "0.7.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "importlib-resources" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9a/41/142150bb66ce16856e75469945a3e1ec21ea4c6cdaac27bacf962854e3ac/aind_data_schema_models-0.7.5.tar.gz", hash = "sha256:9605f0999930b595b9d92316ada0b3a8fa8d28c537330cc5f6198cc8e59d3dee", size = 552889, upload-time = "2025-01-05T23:53:17.974Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/c1/e2177d7e0fa1102e4dcd4563d519c9ed56177d0b6df552dd9e50aacb1367/aind_data_schema_models-0.7.5-py3-none-any.whl", hash = "sha256:f6d934451c672e3c48691759cd5cfb615306c40f30625ef0323285dc69cfceff", size = 532063, upload-time = "2025-01-05T23:53:15.685Z" },
+]
+
+[[package]]
 name = "aind-vr-foraging-processed-qc"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "aind-data-schema" },
     { name = "hdmf-zarr" },
     { name = "matplotlib" },
     { name = "ndx-events" },
@@ -19,6 +47,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aind-data-schema", specifier = "<2.0" },
     { name = "hdmf-zarr" },
     { name = "matplotlib" },
     { name = "ndx-events", git = "https://github.com/rly/ndx-events.git" },
@@ -226,6 +255,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/58/fa/a2524c0df6f895629f06cc984b544bb33825d53aa9e817ead561094870fe/hdmf_zarr-0.11.2.tar.gz", hash = "sha256:c0312d869faa6a4427e6a0ba93f92daa0158a44436d6e28df7d3a8820e0b7445", size = 3105540, upload-time = "2025-07-28T23:45:34.537Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c9/aa/e61adfa59e35bbf695ee7f91205468662cb6283c409c0e3f04dbcce419a0/hdmf_zarr-0.11.2-py3-none-any.whl", hash = "sha256:ce2ebab6644c9a02e3cc9f44cc538bde60f9d4e6fa41bcb6d118e3b59bb4a696", size = 33071, upload-time = "2025-07-28T23:45:33.092Z" },
+]
+
+[[package]]
+name = "importlib-resources"
+version = "6.5.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/8c/f834fbf984f691b4f7ff60f50b514cc3de5cc08abfc3295564dd89c5e2e7/importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c", size = 44693, upload-time = "2025-01-03T18:51:56.698Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/ed/1f1afb2e9e7f38a545d628f864d562a5ae64fe6f7a10e28ffb9b185b4e89/importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec", size = 37461, upload-time = "2025-01-03T18:51:54.306Z" },
 ]
 
 [[package]]
@@ -884,6 +922,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/95/47/1a0b0aff40c3056d955f38b0df5d178350c3d74734ec54f9c68d23910be5/scipy-1.16.1-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:5e1a106f8c023d57a2a903e771228bf5c5b27b5d692088f457acacd3b54511e4", size = 35665080, upload-time = "2025-07-27T16:31:42.025Z" },
     { url = "https://files.pythonhosted.org/packages/64/df/ce88803e9ed6e27fe9b9abefa157cf2c80e4fa527cf17ee14be41f790ad4/scipy-1.16.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:709559a1db68a9abc3b2c8672c4badf1614f3b440b3ab326d86a5c0491eafae3", size = 38050306, upload-time = "2025-07-27T16:31:48.109Z" },
     { url = "https://files.pythonhosted.org/packages/6e/6c/a76329897a7cae4937d403e623aa6aaea616a0bb5b36588f0b9d1c9a3739/scipy-1.16.1-cp314-cp314t-win_amd64.whl", hash = "sha256:c0c804d60492a0aad7f5b2bb1862f4548b990049e27e828391ff2bf6f7199998", size = 39427705, upload-time = "2025-07-27T16:31:53.96Z" },
+]
+
+[[package]]
+name = "semver"
+version = "3.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/d1/d3159231aec234a59dd7d601e9dd9fe96f3afff15efd33c1070019b26132/semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602", size = 269730, upload-time = "2025-01-24T13:19:27.617Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/24/4d91e05817e92e3a61c8a21e08fd0f390f5301f1c448b137c57c4bc6e543/semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746", size = 17912, upload-time = "2025-01-24T13:19:24.949Z" },
 ]
 
 [[package]]
