@@ -66,7 +66,7 @@ if __name__ == "__main__":
     processed_nwb_path = [path for path in paths if path.is_dir()]
 
     if not processed_nwb_path:
-        raise FileNotFoundError("No raw nwb found")
+        raise FileNotFoundError("No processed nwb found")
 
     logger.info(f"Found processed nwb at path {processed_nwb_path[0]}")
     with NWBZarrIO(processed_nwb_path[0].as_posix(), "r") as io:
@@ -92,16 +92,16 @@ if __name__ == "__main__":
 
     evaluations = []
 
-    for name, metric in environment_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metric))
+    for name, metrics in environment_metrics.items():
+        evaluations.append(get_qc_evaluation(name, metrics))
 
-    for name, metric in running_velocity_metric.items():
-        evaluations.append(get_qc_evaluation(name, metric))
+    for name, metrics in running_velocity_metric.items():
+        evaluations.append(get_qc_evaluation(name, metrics))
 
-    for name, metric in general_performance_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metric))
+    for name, metrics in general_performance_metrics.items():
+        evaluations.append(get_qc_evaluation(name, metrics))
 
-    for name, metric in lick_metrics.items():
+    for name, metrics in lick_metrics.items():
         evaluations.append(get_qc_evaluation(name, metric))
 
     with open(settings.input_directory.parent / "raw_qc.json", "r") as f:

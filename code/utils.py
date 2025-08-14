@@ -13,6 +13,25 @@ status_pending = QCStatus(
     evaluator="", status=Status.PENDING, timestamp=datetime.now()
 )
 
+status_pass = QCStatus(
+    evaluator="", status=Status.PASS, timestamp=datetime.now()
+)
+
+status_fail = QCStatus(
+    evaluator="", status=Status.FAIL, timestamp=datetime.now()
+)
+
+# user defined environment threshold to fail
+ENVIRONMENT_THRESHOLD = (23, 28)
+
+# user defined velocity threshold to fail
+VELOCITY_THRESHOLD = 70
+
+# user defined lick density threshold to fail
+LICK_DENSITY_THRESHOLD = 0.1
+
+# user defined number of licks threshold to fail
+NUMBER_OF_LICKS_THRESHOLD = 1000
 
 def get_environment_qc_metrics(
     nwb: NWBFile, output_path: Path
@@ -40,6 +59,10 @@ def get_environment_qc_metrics(
 
     for metric_name in ("Temperature", "Humidity"):
         average = float(sensor_data[metric_name].mean())
+        if average < ENVIRONMENT_THRESHOLD[0] or average > ENVIRONMENT_THRESHOLD[1]:
+            status = status_fail
+        else:
+            status = status_pass
 
         fig, ax = plt.subplots()
         ax.plot(sensor_data["Time"], sensor_data[metric_name])
@@ -52,8 +75,13 @@ def get_environment_qc_metrics(
             name=f"Environment - {metric_name}",
             value={"Average": average},
             reference=f"environment_{metric_name}.png",
-            description=metric_name,
-            status_history=[status_pending],
+            description=str(
+                f"Rule to fail is if Average {metric_name} is below "
+                f"{ENVIRONMENT_THRESHOLD[0]} or is above "
+                f"{ENVIRONMENT_THRESHOLD[1]}. Otherwise pass."
+            ),
+            status_history=[status],
+            
         )
         qc_metrics["Enviornmental Conditions"].append(qc_metric)
 
@@ -82,12 +110,20 @@ def get_running_velocity_qc_metric(
     metric_name = "Running Velocity"
     running_data = nwb.processing["behavior"].data_interfaces["Encoder"]
     data = running_data.data[:]
+    velocity_average = float(np.nanmean(data))
+    if velocity_average < 0 or velocity_average > VELOCITY_THRESHOLD:
+        status = status_fail
+    else:
+        status = status_pass
 
     qc_metric = QCMetric(
         name=metric_name,
-        value={"Average": float(np.nanmean(data))},
-        description=metric_name,
-        status_history=[status_pending],
+        value={"Average": velocity_average},
+        description=str(
+            f"Rule to fail if Average {metric_name} is "
+            f"below 0 or above {VELOCITY_THRESHOLD}"
+        ),
+        status_history=[status],
     )
 
     return {metric_name: [qc_metric]}
@@ -122,14 +158,22 @@ def get_general_performance_qc_metrics(
         .size
     )
 
+    if total_patches == 0 or total_rewards == 0:
+        status = status_fail
+    else:
+        status = status_pass
+
     qc_metric = QCMetric(
         name=metric_name,
         value={
             "Total Rewards": total_rewards,
             "Total Patches": total_patches,
         },
-        description=metric_name,
-        status_history=[status_pending],
+        description=str(
+            f"Rule for failing {metric_name}: If any metrics have value 0, "
+            f"fail. Otherwise pass.",
+        ),
+        status_history=[status],
     )
 
     return {metric_name: [qc_metric]}
@@ -170,6 +214,15 @@ def get_lick_qc_metrics(
         x = np.linspace(0, max(inter_licks_distribution), 500)
         density = kde(x)
 
+        below_mask = density < LICK_DENSITY_THRESHOLD
+        count_below = np.sum(below_mask)
+        proportion_below = count_below / len(density)
+
+        if proportion_below < LICK_DENSITY_THRESHOLD:
+            status = status_fail
+        else:
+            status = status_pass
+
         ax.plot(x, density)
         ax.axhline(0.1, color="r", linestyle="--")
         ax.set_xlabel("Inter-lick interval (s)")
@@ -180,16 +233,28 @@ def get_lick_qc_metrics(
             name="Inter-licks distribution",
             value=None,
             reference="inter_licks_distribution.png",
-            description="Inter-licks distribution",
-            status_history=[status_pending],
+            description=str(
+                f"Rule for failing. If density < "
+                f"{LICK_DENSITY_THRESHOLD}. Otherwise pass."
+            ),
+            status_history=[status],
         )
         metrics[metric_name].append(qc_metric_inter_licks_distribution)
 
+    number_of_licks = len(licks[licks["event_data"]])
+    if number_of_licks == 0 or number_of_licks > NUMBER_OF_LICKS_THRESHOLD:
+        status = status_fail
+    else:
+        status = status_pass
+
     qc_metric_lick_count = QCMetric(
         name="Number of licks",
-        value={"Number of licks": len(licks[licks["event_data"]])},
-        description="Number of licks",
-        status_history=[status_pending],
+        value={"Number of licks": number_of_licks},
+        description=str(
+            "Rule for failing. If number of licks is 0 or "
+            f"above {NUMBER_OF_LICKS_THRESHOLD}. Otherwise pass"
+        ),
+        status_history=[status],
     )
     metrics[metric_name].append(qc_metric_lick_count)
 
@@ -222,6 +287,7 @@ def get_lick_qc_metrics(
     ax.legend()
     fig.savefig(output_path / "licks.png")
 
+    # TODO: get threshold for failing if larger
     qc_metric_within_lick_distribution = QCMetric(
         name="Within lick variability (onset - offset)",
         value={
