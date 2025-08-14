@@ -27,25 +27,41 @@ class VRForagingSettings(BaseSettings, cli_parse_args=True):
         default=Path("/results/"), description="Output directory"
     )
     environment_threshold_low: float = Field(
-        default=23, 
-        description="Threshold to check if metric is lower than this, than fails"
+        default=23,
+        description=str(
+            "Threshold to check if metric is "
+            "lower than this, than fails",
+        )
     )
     environment_threshold_high: float = Field(
         default=28,
-        description="Threshold to check if metric is higher than this, than fails"
+        description=str(
+            "Threshold to check if metric is "
+            "higher than this, than fails",
+        )
     )
     velocity_threshold: float = Field(
         default=70,
-        description="Threshold to check if metric is higher than this, than fails"
+        description=str(
+            "Threshold to check if metric is "
+            "higher than this, than fails",
+        )
     )
     lick_density_threshold: float = Field(
         default=0.1,
-        description="Threshold to check if metric is lower than this, than fails"
+        description=str(
+            "Threshold to check if metric is "
+            "lower than this, than fails",
+        )
     )
     number_of_licks_threshold: float = Field(
         default=1000,
-        description="Threshold to check if metric is higher than this, than fails"
+        description=str(
+            "Threshold to check if metric is "
+            "higher than this, than fails",
+        )
     )
+
 
 def get_qc_evaluation(name: str, metric: QCMetric) -> QCEvaluation:
     """
@@ -94,9 +110,10 @@ if __name__ == "__main__":
 
     logger.info("Computing environment condition evaluation")
     environment_metrics = utils.get_environment_qc_metrics(
-        nwb, settings.output_directory,
+        nwb,
+        settings.output_directory,
         settings.environment_threshold_low,
-        settings.environment_threshold_high
+        settings.environment_threshold_high,
     )
 
     logger.info("Computing running velocity evaluation")
@@ -111,8 +128,10 @@ if __name__ == "__main__":
 
     logger.info("Computing lick evaluations")
     lick_metrics = utils.get_lick_qc_metrics(
-        nwb, settings.output_directory,
-        settings.lick_density_threshold, settings.number_of_licks_threshold
+        nwb,
+        settings.output_directory,
+        settings.lick_density_threshold,
+        settings.number_of_licks_threshold,
     )
 
     evaluations = []

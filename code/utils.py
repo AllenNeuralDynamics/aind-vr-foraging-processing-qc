@@ -23,7 +23,10 @@ status_fail = QCStatus(
 
 
 def get_environment_qc_metrics(
-    nwb: NWBFile, output_path: Path, low_threshold: float, high_threshold: float
+    nwb: NWBFile,
+    output_path: Path,
+    low_threshold: float,
+    high_threshold: float,
 ) -> Dict[str, List[QCMetric]]:
     """
     Gets qc metrics for envrionmental conditions
@@ -35,10 +38,10 @@ def get_environment_qc_metrics(
 
     output_path: Path
         Output directory where figures are to be saved
-    
+
     low_threshold: float
         The threshold to check if values are higher than this
-    
+
     high_threshold: float
         The threshold to check if values are lower than this
 
@@ -76,7 +79,6 @@ def get_environment_qc_metrics(
                 f"{high_threshold}."
             ),
             status_history=[status],
-            
         )
         qc_metrics["Enviornmental Conditions"].append(qc_metric)
 
@@ -96,7 +98,7 @@ def get_running_velocity_qc_metric(
 
     output_path: Path
         Output directory where figures are to be saved
-    
+
     threshold: float
         The threshold to check if values are lower than this
 
@@ -177,7 +179,10 @@ def get_general_performance_qc_metrics(
 
 
 def get_lick_qc_metrics(
-    nwb: NWBFile, output_path: Path, density_threshold: float, number_of_licks_threshold: float
+    nwb: NWBFile,
+    output_path: Path,
+    density_threshold: float,
+    number_of_licks_threshold: float,
 ) -> Dict[str, List[QCMetric]]:
     """
     Gets the lick metrics from the processed nwb
@@ -189,10 +194,10 @@ def get_lick_qc_metrics(
 
     output_path: Path
         Output directory where figures are to be saved
-    
+
     density_threshold: float
         The threshold to check if the lick density are lower than this
-    
+
     number_of_licks_threshold: float
         The threshold to check if number of licks are higher than this
 
@@ -236,10 +241,7 @@ def get_lick_qc_metrics(
             name="Inter-licks distribution",
             value=None,
             reference="inter_licks_distribution.png",
-            description=str(
-                f"Fail when density < "
-                f"{density_threshold}."
-            ),
+            description=str(f"Fail when density < " f"{density_threshold}."),
             status_history=[status],
         )
         metrics[metric_name].append(qc_metric_inter_licks_distribution)
