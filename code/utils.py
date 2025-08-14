@@ -21,20 +21,9 @@ status_fail = QCStatus(
     evaluator="", status=Status.FAIL, timestamp=datetime.now()
 )
 
-# user defined environment threshold to fail
-ENVIRONMENT_THRESHOLD = (23, 28)
-
-# user defined velocity threshold to fail
-VELOCITY_THRESHOLD = 70
-
-# user defined lick density threshold to fail
-LICK_DENSITY_THRESHOLD = 0.1
-
-# user defined number of licks threshold to fail
-NUMBER_OF_LICKS_THRESHOLD = 1000
 
 def get_environment_qc_metrics(
-    nwb: NWBFile, output_path: Path
+    nwb: NWBFile, output_path: Path, low_threshold: float, high_threshold: float
 ) -> Dict[str, List[QCMetric]]:
     """
     Gets qc metrics for envrionmental conditions
@@ -46,6 +35,12 @@ def get_environment_qc_metrics(
 
     output_path: Path
         Output directory where figures are to be saved
+    
+    low_threshold: float
+        The threshold to check if values are higher than this
+    
+    high_threshold: float
+        The threshold to check if values are lower than this
 
     Returns
     -------
@@ -59,7 +54,7 @@ def get_environment_qc_metrics(
 
     for metric_name in ("Temperature", "Humidity"):
         average = float(sensor_data[metric_name].mean())
-        if average < ENVIRONMENT_THRESHOLD[0] or average > ENVIRONMENT_THRESHOLD[1]:
+        if average < low_threshold or average > high_threshold:
             status = status_fail
         else:
             status = status_pass
@@ -76,9 +71,9 @@ def get_environment_qc_metrics(
             value={"Average": average},
             reference=f"environment_{metric_name}.png",
             description=str(
-                f"Rule to fail is if Average {metric_name} is below "
-                f"{ENVIRONMENT_THRESHOLD[0]} or is above "
-                f"{ENVIRONMENT_THRESHOLD[1]}. Otherwise pass."
+                f"Fail when Average {metric_name} is below "
+                f"{low_threshold} or is above "
+                f"{high_threshold}."
             ),
             status_history=[status],
             
@@ -89,7 +84,7 @@ def get_environment_qc_metrics(
 
 
 def get_running_velocity_qc_metric(
-    nwb: NWBFile, output_path: Path
+    nwb: NWBFile, output_path: Path, threshold: float
 ) -> Dict[str, List[QCMetric]]:
     """
     Gets the running velocity from the processed nwb
@@ -101,6 +96,9 @@ def get_running_velocity_qc_metric(
 
     output_path: Path
         Output directory where figures are to be saved
+    
+    threshold: float
+        The threshold to check if values are lower than this
 
     Returns
     -------
@@ -111,7 +109,7 @@ def get_running_velocity_qc_metric(
     running_data = nwb.processing["behavior"].data_interfaces["Encoder"]
     data = running_data.data[:]
     velocity_average = float(np.nanmean(data))
-    if velocity_average < 0 or velocity_average > VELOCITY_THRESHOLD:
+    if velocity_average < 0 or velocity_average > threshold:
         status = status_fail
     else:
         status = status_pass
@@ -120,8 +118,8 @@ def get_running_velocity_qc_metric(
         name=metric_name,
         value={"Average": velocity_average},
         description=str(
-            f"Rule to fail if Average {metric_name} is "
-            f"below 0 or above {VELOCITY_THRESHOLD}"
+            f"Fail when Average {metric_name} is "
+            f"below 0 or above {threshold}"
         ),
         status_history=[status],
     )
@@ -170,8 +168,7 @@ def get_general_performance_qc_metrics(
             "Total Patches": total_patches,
         },
         description=str(
-            f"Rule for failing {metric_name}: If any metrics have value 0, "
-            f"fail. Otherwise pass.",
+            f"Fail {metric_name}: When any metrics have value 0.",
         ),
         status_history=[status],
     )
@@ -180,7 +177,7 @@ def get_general_performance_qc_metrics(
 
 
 def get_lick_qc_metrics(
-    nwb: NWBFile, output_path: Path
+    nwb: NWBFile, output_path: Path, density_threshold: float, number_of_licks_threshold: float
 ) -> Dict[str, List[QCMetric]]:
     """
     Gets the lick metrics from the processed nwb
@@ -192,6 +189,12 @@ def get_lick_qc_metrics(
 
     output_path: Path
         Output directory where figures are to be saved
+    
+    density_threshold: float
+        The threshold to check if the lick density are lower than this
+    
+    number_of_licks_threshold: float
+        The threshold to check if number of licks are higher than this
 
     Returns
     -------
@@ -214,11 +217,11 @@ def get_lick_qc_metrics(
         x = np.linspace(0, max(inter_licks_distribution), 500)
         density = kde(x)
 
-        below_mask = density < LICK_DENSITY_THRESHOLD
+        below_mask = density < density_threshold
         count_below = np.sum(below_mask)
         proportion_below = count_below / len(density)
 
-        if proportion_below < LICK_DENSITY_THRESHOLD:
+        if proportion_below < density_threshold:
             status = status_fail
         else:
             status = status_pass
@@ -234,15 +237,15 @@ def get_lick_qc_metrics(
             value=None,
             reference="inter_licks_distribution.png",
             description=str(
-                f"Rule for failing. If density < "
-                f"{LICK_DENSITY_THRESHOLD}. Otherwise pass."
+                f"Fail when density < "
+                f"{density_threshold}."
             ),
             status_history=[status],
         )
         metrics[metric_name].append(qc_metric_inter_licks_distribution)
 
     number_of_licks = len(licks[licks["event_data"]])
-    if number_of_licks == 0 or number_of_licks > NUMBER_OF_LICKS_THRESHOLD:
+    if number_of_licks == 0 or number_of_licks > number_of_licks_threshold:
         status = status_fail
     else:
         status = status_pass
@@ -251,8 +254,8 @@ def get_lick_qc_metrics(
         name="Number of licks",
         value={"Number of licks": number_of_licks},
         description=str(
-            "Rule for failing. If number of licks is 0 or "
-            f"above {NUMBER_OF_LICKS_THRESHOLD}. Otherwise pass"
+            "Fail when number of licks is 0 or "
+            f"above {number_of_licks_threshold}."
         ),
         status_history=[status],
     )

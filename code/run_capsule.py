@@ -26,7 +26,26 @@ class VRForagingSettings(BaseSettings, cli_parse_args=True):
     output_directory: Path = Field(
         default=Path("/results/"), description="Output directory"
     )
-
+    environment_threshold_low: float = Field(
+        default=23, 
+        description="Threshold to check if metric is lower than this, than fails"
+    )
+    environment_threshold_high: float = Field(
+        default=28,
+        description="Threshold to check if metric is higher than this, than fails"
+    )
+    velocity_threshold: float = Field(
+        default=70,
+        description="Threshold to check if metric is higher than this, than fails"
+    )
+    lick_density_threshold: float = Field(
+        default=0.1,
+        description="Threshold to check if metric is lower than this, than fails"
+    )
+    number_of_licks_threshold: float = Field(
+        default=1000,
+        description="Threshold to check if metric is higher than this, than fails"
+    )
 
 def get_qc_evaluation(name: str, metric: QCMetric) -> QCEvaluation:
     """
@@ -62,6 +81,7 @@ if __name__ == "__main__":
     )
 
     settings = VRForagingSettings()
+    logger.info(f"Settings: {settings}")
     paths = tuple(settings.input_directory.glob("*"))
     processed_nwb_path = [path for path in paths if path.is_dir()]
 
@@ -74,12 +94,14 @@ if __name__ == "__main__":
 
     logger.info("Computing environment condition evaluation")
     environment_metrics = utils.get_environment_qc_metrics(
-        nwb, settings.output_directory
+        nwb, settings.output_directory,
+        settings.environment_threshold_low,
+        settings.environment_threshold_high
     )
 
     logger.info("Computing running velocity evaluation")
     running_velocity_metric = utils.get_running_velocity_qc_metric(
-        nwb, settings.output_directory
+        nwb, settings.output_directory, settings.velocity_threshold
     )
 
     logger.info("Computing general peformance evaluation")
@@ -88,7 +110,10 @@ if __name__ == "__main__":
     )
 
     logger.info("Computing lick evaluations")
-    lick_metrics = utils.get_lick_qc_metrics(nwb, settings.output_directory)
+    lick_metrics = utils.get_lick_qc_metrics(
+        nwb, settings.output_directory,
+        settings.lick_density_threshold, settings.number_of_licks_threshold
+    )
 
     evaluations = []
 
@@ -102,7 +127,7 @@ if __name__ == "__main__":
         evaluations.append(get_qc_evaluation(name, metrics))
 
     for name, metrics in lick_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metric))
+        evaluations.append(get_qc_evaluation(name, metrics))
 
     with open(settings.input_directory.parent / "raw_qc.json", "r") as f:
         raw_qc = json.load(f)
