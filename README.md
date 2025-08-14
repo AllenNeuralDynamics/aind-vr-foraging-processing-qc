@@ -31,11 +31,11 @@ Currently, the output includes metrics and plots related to environment conditio
                     "status_history": [
                         {
                             "evaluator": "",
-                            "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "status": "Fail",
+                            "timestamp": "2025-08-14T21:28:27.573245Z"
                         }
                     ],
-                    "description": "Temperature",
+                    "description": "Fail when Average Temperature is below 23.0 or is above 28.0.",
                     "reference": "environment_Temperature.png",
                     "evaluated_assets": null
                 },
@@ -47,11 +47,11 @@ Currently, the output includes metrics and plots related to environment conditio
                     "status_history": [
                         {
                             "evaluator": "",
-                            "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "status": "Fail",
+                            "timestamp": "2025-08-14T21:28:27.573245Z"
                         }
                     ],
-                    "description": "Humidity",
+                    "description": "Fail when Average Humidity is below 23.0 or is above 28.0.",
                     "reference": "environment_Humidity.png",
                     "evaluated_assets": null
                 }
@@ -59,8 +59,8 @@ Currently, the output includes metrics and plots related to environment conditio
             "tags": null,
             "notes": null,
             "allow_failed_metrics": false,
-            "latest_status": "Pending",
-            "created": "2025-08-11T23:00:46.192781Z"
+            "latest_status": "Fail",
+            "created": "2025-08-14T21:28:36.356332Z"
         },
         {
             "modality": {
@@ -79,11 +79,11 @@ Currently, the output includes metrics and plots related to environment conditio
                     "status_history": [
                         {
                             "evaluator": "",
-                            "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "status": "Pass",
+                            "timestamp": "2025-08-14T21:28:27.572760Z"
                         }
                     ],
-                    "description": "Running Velocity",
+                    "description": "Fail when Average Running Velocity is below 0 or above 70.0",
                     "reference": null,
                     "evaluated_assets": null
                 }
@@ -91,8 +91,8 @@ Currently, the output includes metrics and plots related to environment conditio
             "tags": null,
             "notes": null,
             "allow_failed_metrics": false,
-            "latest_status": "Pending",
-            "created": "2025-08-11T23:00:46.192856Z"
+            "latest_status": "Pass",
+            "created": "2025-08-14T21:28:36.356403Z"
         },
         {
             "modality": {
@@ -112,11 +112,11 @@ Currently, the output includes metrics and plots related to environment conditio
                     "status_history": [
                         {
                             "evaluator": "",
-                            "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "status": "Pass",
+                            "timestamp": "2025-08-14T21:28:27.572760Z"
                         }
                     ],
-                    "description": "General Performance",
+                    "description": "Fail General Performance: When any metrics have value 0.",
                     "reference": null,
                     "evaluated_assets": null
                 }
@@ -124,8 +124,8 @@ Currently, the output includes metrics and plots related to environment conditio
             "tags": null,
             "notes": null,
             "allow_failed_metrics": false,
-            "latest_status": "Pending",
-            "created": "2025-08-11T23:00:46.192875Z"
+            "latest_status": "Pass",
+            "created": "2025-08-14T21:28:36.356426Z"
         },
         {
             "modality": {
@@ -142,11 +142,11 @@ Currently, the output includes metrics and plots related to environment conditio
                     "status_history": [
                         {
                             "evaluator": "",
-                            "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "status": "Pass",
+                            "timestamp": "2025-08-14T21:28:27.572760Z"
                         }
                     ],
-                    "description": "Inter-licks distribution",
+                    "description": "Fail when density < 0.1.",
                     "reference": "inter_licks_distribution.png",
                     "evaluated_assets": null
                 },
@@ -158,11 +158,11 @@ Currently, the output includes metrics and plots related to environment conditio
                     "status_history": [
                         {
                             "evaluator": "",
-                            "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "status": "Pass",
+                            "timestamp": "2025-08-14T21:28:27.572760Z"
                         }
                     ],
-                    "description": "Number of licks",
+                    "description": "Fail when number of licks is 0 or above 1000.0.",
                     "reference": null,
                     "evaluated_assets": null
                 },
@@ -175,7 +175,7 @@ Currently, the output includes metrics and plots related to environment conditio
                         {
                             "evaluator": "",
                             "status": "Pending",
-                            "timestamp": "2025-08-11T23:00:38.470776Z"
+                            "timestamp": "2025-08-14T21:28:27.572048Z"
                         }
                     ],
                     "description": "Within lick variability",
@@ -187,7 +187,7 @@ Currently, the output includes metrics and plots related to environment conditio
             "notes": null,
             "allow_failed_metrics": false,
             "latest_status": "Pending",
-            "created": "2025-08-11T23:00:46.192889Z"
+            "created": "2025-08-14T21:28:36.356441Z"
         },
         {
             "modality": {
