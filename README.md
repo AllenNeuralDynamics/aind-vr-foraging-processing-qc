@@ -7,7 +7,7 @@ See [readme](https://github.com/AllenNeuralDynamics/aind-vr-foraging-processing-
 The processed NWB file has 3 main modules that are used for generating qc metrics. They are **`acquisition`**, **`events`**, and **`processing`**. From these modules, qc metrics are calculated - see `utils.py` for more information on implementation. 
 
 ### Output
-Currently, the output includes metrics and plots related to environment conditions, licks, and general peformance. In addition, a **`quality_control`**.json file is included that adheres to the metadata schema defined [here](https://github.com/AllenNeuralDynamics/aind-data-schema). The quality control json integrates metrics and plots and follows the schema. In addition, it combines it with the quality contorl json from the primary qc capsule (see [readme](https://github.com/AllenNeuralDynamics/aind-vr-foraging-primary-qc) for more details. Sample output of quality control json is below.
+Currently, the output includes metrics and plots related to environment conditions, licks, and general peformance. In addition, a **`quality_control`**.json file is included that adheres to the metadata schema defined [here](https://github.com/AllenNeuralDynamics/aind-data-schema). The quality control json integrates metrics and plots and follows the schema. In addition, it combines it with the quality contrl json from the primary qc capsule (see [readme](https://github.com/AllenNeuralDynamics/aind-vr-foraging-primary-qc) for more details. Sample output of quality control json is below.
 
 ```json
 {
