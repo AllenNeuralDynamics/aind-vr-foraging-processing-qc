@@ -2,8 +2,8 @@ import json
 import logging
 from pathlib import Path
 
-from aind_data_schema.core.quality_control import (QCEvaluation, QCMetric,
-                                                   QualityControl, Stage)
+from aind_data_schema.core.quality_control import (QCMetric,
+                                                   QualityControl)
 from aind_data_schema_models.modalities import Modality
 from hdmf_zarr import NWBZarrIO
 from pydantic import Field
@@ -63,34 +63,6 @@ class VRForagingSettings(BaseSettings, cli_parse_args=True):
     )
 
 
-def get_qc_evaluation(name: str, metric: QCMetric) -> QCEvaluation:
-    """
-    Gets the qc evaluation
-
-    Parameters
-    ----------
-    name: str
-        The name of the evaluation
-
-    metric: QCMetric
-        The qc metric
-
-    Returns
-    -------
-    QCEvaluation
-        The qc evalution with the qc metric
-    """
-    evaluation = QCEvaluation(
-        modality=Modality.BEHAVIOR,
-        stage=Stage.PROCESSING,
-        name=name,
-        description=name,
-        metrics=metric,
-    )
-
-    return evaluation
-
-
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -108,7 +80,7 @@ if __name__ == "__main__":
     with NWBZarrIO(processed_nwb_path[0].as_posix(), "r") as io:
         nwb = io.read()
 
-    logger.info("Computing environment condition evaluation")
+    logger.info("Computing environment condition metrics")
     environment_metrics = utils.get_environment_qc_metrics(
         nwb,
         settings.output_directory,
@@ -116,17 +88,17 @@ if __name__ == "__main__":
         settings.environment_threshold_high,
     )
 
-    logger.info("Computing running velocity evaluation")
+    logger.info("Computing running velocity metrics")
     running_velocity_metric = utils.get_running_velocity_qc_metric(
         nwb, settings.output_directory, settings.velocity_threshold
     )
 
-    logger.info("Computing general peformance evaluation")
+    logger.info("Computing general peformance metrics")
     general_performance_metrics = utils.get_general_performance_qc_metrics(
         nwb, settings.output_directory
     )
 
-    logger.info("Computing lick evaluations")
+    logger.info("Computing lick metrics")
     lick_metrics = utils.get_lick_qc_metrics(
         nwb,
         settings.output_directory,
@@ -134,26 +106,33 @@ if __name__ == "__main__":
         settings.number_of_licks_threshold,
     )
 
-    evaluations = []
+    qc_metrics = []
+    qc_tags = set()
 
     for name, metrics in environment_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metrics))
+        qc_metrics.extend(metrics)
+        qc_tags.add(name)
 
     for name, metrics in running_velocity_metric.items():
-        evaluations.append(get_qc_evaluation(name, metrics))
+        qc_metrics.extend(metrics)
+        qc_tags.add(name)
 
     for name, metrics in general_performance_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metrics))
+        qc_metrics.extend(metrics)
+        qc_tags.add(name)
 
     for name, metrics in lick_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metrics))
+        qc_metrics.extend(metrics)
+        qc_tags.add(name)
 
     with open(settings.input_directory.parent / "raw_qc.json", "r") as f:
         raw_qc = json.load(f)
 
-    for evaluation in QualityControl(**raw_qc).evaluations:
-        evaluations.append(evaluation)
+    for metric in QualityControl(**raw_qc).metrics:
+        qc_metrics.append(metric)
+        for tag in metric.tags:
+            qc_tags.add(tag)
 
-    quality_control = QualityControl(evaluations=evaluations)
+    quality_control = QualityControl(metrics=qc_metrics, default_grouping=list(qc_tags))
     with open(settings.output_directory / "quality_control.json", "w") as f:
         f.write(quality_control.model_dump_json(indent=4))
