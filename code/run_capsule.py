@@ -2,9 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-from aind_data_schema.core.quality_control import (QCMetric,
-                                                   QualityControl)
-from aind_data_schema_models.modalities import Modality
+from aind_data_schema.core.quality_control import QualityControl
 from hdmf_zarr import NWBZarrIO
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -29,37 +27,32 @@ class VRForagingSettings(BaseSettings, cli_parse_args=True):
     environment_threshold_low: float = Field(
         default=23,
         description=str(
-            "Threshold to check if metric is "
-            "lower than this, than fails",
-        )
+            "Threshold to check if metric is " "lower than this, than fails",
+        ),
     )
     environment_threshold_high: float = Field(
         default=28,
         description=str(
-            "Threshold to check if metric is "
-            "higher than this, than fails",
-        )
+            "Threshold to check if metric is " "higher than this, than fails",
+        ),
     )
     velocity_threshold: float = Field(
         default=70,
         description=str(
-            "Threshold to check if metric is "
-            "higher than this, than fails",
-        )
+            "Threshold to check if metric is " "higher than this, than fails",
+        ),
     )
     lick_density_threshold: float = Field(
         default=0.1,
         description=str(
-            "Threshold to check if metric is "
-            "lower than this, than fails",
-        )
+            "Threshold to check if metric is " "lower than this, than fails",
+        ),
     )
     number_of_licks_threshold: float = Field(
         default=1000,
         description=str(
-            "Threshold to check if metric is "
-            "higher than this, than fails",
-        )
+            "Threshold to check if metric is " "higher than this, than fails",
+        ),
     )
 
 
@@ -133,6 +126,8 @@ if __name__ == "__main__":
         for tag in metric.tags:
             qc_tags.add(tag)
 
-    quality_control = QualityControl(metrics=qc_metrics, default_grouping=list(qc_tags))
+    quality_control = QualityControl(
+        metrics=qc_metrics, default_grouping=list(qc_tags)
+    )
     with open(settings.output_directory / "quality_control.json", "w") as f:
         f.write(quality_control.model_dump_json(indent=4))

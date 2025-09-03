@@ -5,7 +5,8 @@ from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
-from aind_data_schema.core.quality_control import QCMetric, QCStatus, Status, Stage
+from aind_data_schema.core.quality_control import (QCMetric, QCStatus, Stage,
+                                                   Status)
 from aind_data_schema_models.modalities import Modality
 from pynwb import NWBFile
 from scipy.stats import gaussian_kde
@@ -82,7 +83,7 @@ def get_environment_qc_metrics(
             status_history=[status],
             tags=["Environmental Conditions"],
             modality=Modality.BEHAVIOR,
-            stage=Stage.PROCESSING
+            stage=Stage.PROCESSING,
         )
         qc_metrics["Enviornmental Conditions"].append(qc_metric)
 
@@ -130,7 +131,7 @@ def get_running_velocity_qc_metric(
         status_history=[status],
         tags=[metric_name],
         modality=Modality.BEHAVIOR,
-        stage=Stage.PROCESSING
+        stage=Stage.PROCESSING,
     )
 
     return {metric_name: [qc_metric]}
@@ -182,7 +183,7 @@ def get_general_performance_qc_metrics(
         status_history=[status],
         tags=[metric_name],
         modality=Modality.BEHAVIOR,
-        stage=Stage.PROCESSING
+        stage=Stage.PROCESSING,
     )
 
     return {metric_name: [qc_metric]}
@@ -255,7 +256,7 @@ def get_lick_qc_metrics(
             status_history=[status],
             tags=[metric_name],
             modality=Modality.BEHAVIOR,
-            stage=Stage.PROCESSING
+            stage=Stage.PROCESSING,
         )
         metrics[metric_name].append(qc_metric_inter_licks_distribution)
 
@@ -275,7 +276,7 @@ def get_lick_qc_metrics(
         status_history=[status],
         tags=[metric_name],
         modality=Modality.BEHAVIOR,
-        stage=Stage.PROCESSING
+        stage=Stage.PROCESSING,
     )
     metrics[metric_name].append(qc_metric_lick_count)
 
@@ -321,7 +322,7 @@ def get_lick_qc_metrics(
         status_history=[status_pending],
         tags=[metric_name],
         modality=Modality.BEHAVIOR,
-        stage=Stage.PROCESSING
+        stage=Stage.PROCESSING,
     )
     metrics[metric_name].append(qc_metric_within_lick_distribution)
 
