@@ -108,13 +108,6 @@ if __name__ == "__main__":
     with NWBZarrIO(processed_nwb_path[0].as_posix(), "r") as io:
         nwb = io.read()
 
-    logger.info("Computing environment condition evaluation")
-    environment_metrics = utils.get_environment_qc_metrics(
-        nwb,
-        settings.output_directory,
-        settings.environment_threshold_low,
-        settings.environment_threshold_high,
-    )
 
     logger.info("Computing running velocity evaluation")
     running_velocity_metric = utils.get_running_velocity_qc_metric(
@@ -126,26 +119,12 @@ if __name__ == "__main__":
         nwb, settings.output_directory
     )
 
-    logger.info("Computing lick evaluations")
-    lick_metrics = utils.get_lick_qc_metrics(
-        nwb,
-        settings.output_directory,
-        settings.lick_density_threshold,
-        settings.number_of_licks_threshold,
-    )
-
     evaluations = []
-
-    for name, metrics in environment_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metrics))
 
     for name, metrics in running_velocity_metric.items():
         evaluations.append(get_qc_evaluation(name, metrics))
 
     for name, metrics in general_performance_metrics.items():
-        evaluations.append(get_qc_evaluation(name, metrics))
-
-    for name, metrics in lick_metrics.items():
         evaluations.append(get_qc_evaluation(name, metrics))
 
     with open(settings.input_directory.parent / "raw_qc.json", "r") as f:
